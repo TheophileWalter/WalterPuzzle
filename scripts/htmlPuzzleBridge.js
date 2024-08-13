@@ -96,3 +96,33 @@ function loadFromHash() {
         gameToHtml(puzzle);
     }
 }
+
+function toggleConstraint(element, side, number) {
+    var img = element.children[0];
+    var orientation = side == 'top' || side == 'bottom' ? 'horizontal' : 'vertical';
+    var state = extractBetween(img.src, orientation + '-', '.svg');
+    var newState = 'off';
+    if (side == 'top') {
+        if (state == 'off') newState = 'up';
+        else if (state == 'up') newState = 'down';
+    } else if (side == 'right') {
+        if (state == 'off') newState = 'right';
+        else if (state == 'right') newState = 'left';
+    } else if (side == 'bottom') {
+        if (state == 'off') newState = 'down';
+        else if (state == 'down') newState = 'up';
+    } else if (side == 'left') {
+        if (state == 'off') newState = 'left';
+        else if (state == 'left') newState = 'right';
+    }
+    img.src = img.src.replace(`${orientation}-${state}.svg`, `${orientation}-${newState}.svg`);
+}
+
+function extractBetween(src, startVar, endVar) {
+    var regex = new RegExp(startVar + "(.*?)" + endVar);
+    var match = src.match(regex);
+    if (match && match[1]) {
+        return match[1];
+    }
+    return null;
+}

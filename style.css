@@ -18,17 +18,39 @@
 }
 .grid {
     display: grid;
-    grid-template-columns: repeat(4, 60px);
-    grid-template-rows: repeat(4, 60px);
+    grid-template-columns: repeat(6, 60px);
+    grid-template-rows: repeat(6, 60px);
     gap: 0;
+}
+.grid .cell, .grid .corner, .grid .horizontal-constraint, .grid .vertical-constraint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .grid .cell {
     width: 60px;
     height: 60px;
     border: 1px solid #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+}
+.grid .corner {
+    width: 64px;
+    height: 60px;
+}
+.grid .horizontal-constraint {
+    width: 60px;
+    height: 40px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+.grid .vertical-constraint {
+    width: 40px;
+    height: 60px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+.grid .vertical-constraint img, .grid .horizontal-constraint img, .grid .corner img {
+    max-width: 100%;
+    max-height: 100%;
 }
 .grid .cell img {
     width: 80px;

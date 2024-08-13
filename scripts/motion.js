@@ -13,14 +13,14 @@ for (let i = 0; i < 16; i++) {
 }
 
 // Create and append cells to the grid
-for (let i = 0; i < 16; i++) {
+/*for (let i = 0; i < 16; i++) {
     const cell = document.createElement('div');
     cell.className = 'cell';
     cell.id = `${Math.floor(i / 4)}-${i % 4}`;
     cell.addEventListener('dragover', dragOver);
     cell.addEventListener('drop', drop);
     grid.appendChild(cell);
-}
+}*/
 
 let draggedImage = null;
 
