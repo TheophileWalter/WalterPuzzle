@@ -158,8 +158,23 @@ class WalterPuzzle {
         return errors;
     }
 
+    /**
+     * Returns the hash of the puzzle game.
+     * @returns {string} The hash of the puzzle game.
+     */
     getHash() {
         return btoa(this.grid.flat().map(piece => piece === null ? '' : piece.number).join('-'));
+    }
+
+    static fromHash(hash) {
+        var numbers = atob(hash).split('-');
+        var puzzle = new WalterPuzzle();
+        numbers.forEach((number, index) => {
+            if (number !== '') {
+                puzzle.setPiece(Math.floor(index / 4), index % 4, parseInt(number));
+            }
+        });
+        return puzzle;
     }
 
 }

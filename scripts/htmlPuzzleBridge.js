@@ -85,3 +85,14 @@ function resetButton() {
     puzzle = new WalterPuzzle();
     gameToHtml(puzzle);
 }
+
+/**
+ * Loads the puzzle from the hash.
+ */
+function loadFromHash() {
+    var hash = window.location.hash;
+    if (hash.length > 1) {
+        puzzle = WalterPuzzle.fromHash(hash.substring(1));
+        gameToHtml(puzzle);
+    }
+}
