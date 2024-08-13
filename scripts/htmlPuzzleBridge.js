@@ -37,6 +37,7 @@ function gameToHtml(puzzle) {
         }
     }
     displayErrors();
+    window.location.hash = puzzle.getHash();
 }
 
 /**
@@ -51,4 +52,26 @@ function displayErrors() {
             document.getElementById(i).classList.remove('red-filter');
         }
     }
+}
+
+/**
+ * Solves the puzzle game and updates the HTML elements.
+ */
+function solveButton() {
+    if (puzzle.getErrors().length > 0) {
+        alert('The puzzle has errors.');
+        return;
+    }
+    if (!puzzle.solve()) {
+        alert('The puzzle is not solvable.');
+    }
+    gameToHtml(puzzle);
+}
+
+/**
+ * Resets the puzzle game and updates the HTML elements.
+ */
+function resetButton() {
+    puzzle = new WalterPuzzle();
+    gameToHtml(puzzle);
 }
