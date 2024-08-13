@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Drag and Drop Grid</title>
+	<style>
+		.container {
+			display: flex;
+		}
+		.image-list, .grid {
+			margin: 10px;
+			padding: 10px;
+			border: 1px solid #ccc;
+		}
+		.image-list {
+			display: flex;
+			flex-wrap: wrap;
+		}
+		.image-list img {
+			width: 80px;
+			height: 80px;
+			margin: 5px;
+			cursor: grab;
+		}
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(4, 60px);
+			grid-template-rows: repeat(4, 60px);
+			gap: 0;
+		}
+		.grid .cell {
+			width: 60px;
+			height: 60px;
+			border: 1px solid #ccc;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		.grid .cell img {
+			width: 80px;
+			height: 80px;
+		}
+        img {
+            z-index: 10;
+        }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="grid" id="grid">
+			<!-- Grid cells will be added here -->
+		</div>
+		<div class="image-list" id="imageList">
+			<!-- Images will be added here -->
+		</div>
+	</div>
+
+	<script>
+		const imageList = document.getElementById('imageList');
+		const grid = document.getElementById('grid');
+
+		// Create and append images to the image list
+		for (let i = 0; i < 16; i++) {
+			const img = document.createElement('img');
+			img.src = `./pieces/${i}.svg`;
+			img.draggable = true;
+			img.id = `img${i}`;
+			img.addEventListener('dragstart', dragStart);
+			img.addEventListener('dragend', dragEnd);
+			imageList.appendChild(img);
+		}
+
+		// Create and append cells to the grid
+		for (let i = 0; i < 16; i++) {
+			const cell = document.createElement('div');
+			cell.className = 'cell';
+            cell.id = `cell${i}`;
+			cell.addEventListener('dragover', dragOver);
+			cell.addEventListener('drop', drop);
+			grid.appendChild(cell);
+		}
+
+		let draggedImage = null;
+
+		function dragStart(event) {
+			draggedImage = event.target;
+			setTimeout(() => {
+				event.target.style.display = 'none';
+			}, 0);
+		}
+
+		function dragEnd(event) {
+			setTimeout(() => {
+				event.target.style.display = 'block';
+				draggedImage = null;
+			}, 0);
+		}
+
+		function dragOver(event) {
+			event.preventDefault();
+		}
+
+		function drop(event) {
+			event.preventDefault();
+			let targetCell = event.target;
+
+			// If the target is an image, get its parent cell
+			if (targetCell.tagName === 'IMG') {
+				targetCell = targetCell.parentElement;
+			}
+
+			if (targetCell.className === 'cell') {
+				if (targetCell.children.length === 0) {
+					targetCell.appendChild(draggedImage);
+				} else {
+					const existingImage = targetCell.children[0];
+					imageList.appendChild(existingImage);
+					targetCell.appendChild(draggedImage);
+				}
+			} else if (targetCell.id === 'imageList') {
+				imageList.appendChild(draggedImage);
+			}
+		}
+
+		imageList.addEventListener('dragover', dragOver);
+		imageList.addEventListener('drop', drop);
+	</script>
+</body>
+</html>
