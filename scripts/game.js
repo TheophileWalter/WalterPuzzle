@@ -80,6 +80,10 @@ class WalterPuzzle {
         return this.getPiece(row, col - 1);
     }
 
+    solve() {
+        
+    }
+
     /**
      * Calculates and returns the errors in the puzzle game.
      * @returns {Array<number>} An array containing the numbers of the pieces with errors.
@@ -98,6 +102,10 @@ class WalterPuzzle {
             }
         }
         return errors;
+    }
+
+    getHash() {
+        return btoa(this.grid.flat().map(piece => piece === null ? '' : piece.number).join('-'));
     }
 
 }

@@ -84,23 +84,13 @@ function drop(event) {
     }
 
     // Update the puzzle
-    puzzle = new WalterPuzzle();
-    for (var i = 0; i < 16; i++) {
-        var x = Math.floor(i / 4), y = i % 4;
-        var cell = document.getElementById(`${x}-${y}`);
-        if (cell.children.length !== 0) {
-            puzzle.setPiece(x, y, parseInt(cell.children[0].id));
-        }
-    }
+    puzzle = htmlToGame();
 
-    var errors = puzzle.getErrors();
-    for (var i = 0; i < 16; i++) {
-        if (errors.indexOf(i) > -1) {
-            document.getElementById(i).classList.add('red-filter');
-        } else {
-            document.getElementById(i).classList.remove('red-filter');
-        }
-    }
+    // Display errors
+    displayErrors();
+
+    // Update hash
+    window.location.hash = puzzle.getHash();
 
 }
 

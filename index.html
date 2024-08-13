@@ -3,8 +3,9 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Drag and Drop Grid</title>
+	<title>Walter Puzzle</title>
 	<link rel="stylesheet" href="./style.css">
+    <link rel="icon" href="./pieces/3.svg">
 </head>
 <body>
 	<div class="container">
@@ -15,11 +16,17 @@
 			<!-- Images will be added here -->
 		</div>
 	</div>
+	<div class="controls">
+		<button id="solve" onclick="puzzle.solve();gameToHtml(puzzle);">Solve</button>
+		<button id="reset" onclick="puzzle=new WalterPuzzle();gameToHtml(puzzle);">Reset</button>
+	</div>
 
 	<script src="./scripts/game.js"></script>
 	<script src="./scripts/motion.js"></script>
+	<script src="./scripts/htmlPuzzleBridge.js"></script>
     <script>
         let puzzle = new WalterPuzzle();
+		// TODO: Load from hash
     </script>
 </body>
 </html>
