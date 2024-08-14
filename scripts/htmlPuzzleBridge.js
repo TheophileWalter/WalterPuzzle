@@ -181,15 +181,15 @@ function saveButton() {
         var puzzles = JSON.parse(localStorage.getItem('puzzles') || '[]');
         puzzles.push({name: name, hash: hash, preview: preview});
         localStorage.setItem('puzzles', JSON.stringify(puzzles));
+        displaySavedPuzzles();
     });
-    displaySavedPuzzles();
 }
 
 function displaySavedPuzzles() {
     let puzzles = JSON.parse(localStorage.getItem('puzzles') || '[]');
     var list = document.getElementById('saved-puzzles');
     list.innerHTML = puzzles.length === 0 ? '' : '<h4>Saved puzzles</h4>';
-    puzzles.forEach(puzzle => {
+    puzzles.reverse().forEach(puzzle => {
         var item = document.createElement('div');
         item.classList.add('saved-puzzle');
         item.onclick = () => loadSavedPuzzle(puzzle.hash);

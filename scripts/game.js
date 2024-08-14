@@ -200,22 +200,29 @@ class WalterPuzzle {
      * @returns {string} The hash of the puzzle game.
      */
     getHash() {
-        var cells = this.grid.flat().map(piece => piece === null ? '' : piece.number).join('-');
-        var constraints = Object.values(this.constraints).flat().map(constraint => constraint === null ? '' : constraint ? '1' : '0').join('-');
-        return btoa(cells + ';' + constraints);
+        // Cells are stored on 5 bits from 0b00000 to 0b01111 for pieces 0 to 15 and 0b10000 for empty cells
+        var cells = this.grid.flat().map(piece => piece === null ? '10000' : '0' + piece.number.toString(2).padStart(4, '0')).join('');
+        // Constraints are stored on 2 bits: 0x00 for null, 0x01 for false and 0x10 for true
+        var constraints = Object.values(this.constraints).flat().map(constraint => constraint === null ? '00' : (constraint ? '10' : '01')).join('');
+        return WalterPuzzle.binaryToBase64(cells + constraints);
     }
 
     static fromHash(hash) {
 
         // Decode the hash
-        var parts = atob(hash).split(';');
-        if (parts.length !== 2) {
-            return null;
-        }
+        var bin = WalterPuzzle.base64ToBinary(hash);
 
         // Parse the parts
-        var numbers = parts[0].split('-');
-        var constraints = parts[1].split('-');
+        var numbers = [];
+        for (var i = 0; i < 16; i++) {
+            var piece = parseInt(bin.slice(i * 5, i * 5 + 5), 2);
+            numbers.push(piece === 0b10000 ? '' : piece);
+        }
+        var constraints = [];
+        for (var i = 0; i < 16; i++) {
+            var constraint = parseInt(bin.slice(80 + i * 2, 80 + i * 2 + 2), 2);
+            constraints.push(constraint === 0b00 ? '' : (constraint === 0b10 ? '1' : '0'));
+        }
 
         // Create the puzzle
         var puzzle = new WalterPuzzle();
@@ -241,6 +248,34 @@ class WalterPuzzle {
         });
 
         return puzzle;
+    }
+
+    /**
+     * Converts a binary string to a base64 string.
+     * @param {string} binaryString The binary string to convert.
+     * @returns {string} The base64 string.
+     */
+    static binaryToBase64(binaryString) {
+        let charString = '';
+        for (let i = 0; i < binaryString.length; i += 8) {
+            charString += String.fromCharCode(parseInt(binaryString.slice(i, i + 8), 2));
+        }
+        return btoa(charString);
+    }
+
+    /**
+     * Converts a base64 string to a binary string.
+     * @param {string} base64String The base64 string to convert.
+     * @returns {string} The binary string.
+     */
+    static base64ToBinary(base64String) {
+        let charString = atob(base64String);
+        let binaryString = '';
+        for (let i = 0; i < charString.length; i++) {
+            let binaryChar = charString.charCodeAt(i).toString(2);
+            binaryString += binaryChar.padStart(8, '0');
+        }
+        return binaryString;
     }
 
 }

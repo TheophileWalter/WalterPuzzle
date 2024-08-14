@@ -4,6 +4,9 @@ body {
 .container {
     display: flex;
 }
+.image-list {
+    min-width: 150px;
+}
 .image-list, .grid {
     margin: 10px;
     padding: 10px;
