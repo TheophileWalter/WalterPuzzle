@@ -148,6 +148,67 @@ function countButton() {
 }
 
 /**
+ * Returns the base64 representation of the game preview.
+ * @param {function} callback The function to call with the base64 representation of the game preview.
+ * @param {number} width The width of the game preview (optional).
+ * @param {number} height The height of the game preview (optional).
+ * @returns {string} The base64 representation of the game preview.
+ */
+function getGamePreview(callback, width = null, height = null) {
+
+    const element = document.getElementById('grid');
+    const canvas = document.getElementById('canvas');
+    html2canvas(element).then(function (canvasElement) {
+        const context = canvas.getContext('2d');
+        canvas.width = width === null ? canvasElement.width : width;
+        canvas.height = height === null ? canvasElement.height : height;
+        context.drawImage(canvasElement, 0, 0, canvas.width, canvas.height);
+        callback(canvas.toDataURL());
+    });
+
+}
+
+/**
+ * Saves the puzzle game to the local storage.
+ */
+function saveButton() {
+    getGamePreview(preview => {
+        var hash = puzzle.getHash();
+        var name = prompt('Enter the name of the puzzle:', 'Puzzle - ' + new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString());
+        if (name === null) {
+            return;
+        }
+        var puzzles = JSON.parse(localStorage.getItem('puzzles') || '[]');
+        puzzles.push({name: name, hash: hash, preview: preview});
+        localStorage.setItem('puzzles', JSON.stringify(puzzles));
+    });
+    displaySavedPuzzles();
+}
+
+function displaySavedPuzzles() {
+    let puzzles = JSON.parse(localStorage.getItem('puzzles') || '[]');
+    var list = document.getElementById('saved-puzzles');
+    list.innerHTML = puzzles.length === 0 ? '' : '<h4>Saved puzzles</h4>';
+    puzzles.forEach(puzzle => {
+        var item = document.createElement('div');
+        item.classList.add('saved-puzzle');
+        item.onclick = () => loadSavedPuzzle(puzzle.hash);
+        item.innerHTML = `<img src="${puzzle.preview}" /><br /><strong>${puzzle.name}</strong>`;
+        list.appendChild(item);
+    });
+}
+
+/**
+ * Loads a saved puzzle.
+ * @param {string} hash The hash of the saved puzzle.
+ */
+function loadSavedPuzzle(hash) {
+    console.log(`Loading saved puzzle: ${hash}`);
+    puzzle = WalterPuzzle.fromHash(hash);
+    gameToHtml(puzzle);
+}
+
+/**
  * Resets the puzzle game and updates the HTML elements.
  */
 function resetButton() {

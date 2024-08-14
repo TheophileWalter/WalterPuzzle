@@ -6,16 +6,17 @@
 	<title>Walter Puzzle</title>
 	<link rel="stylesheet" href="./style.css">
     <link rel="icon" href="./pieces/3.svg">
+	<script src="./thirdparty/scripts/html2canvas.min.js"></script>
 </head>
 <body>
 	<div class="container">
 		<div class="grid" id="grid">
-			<div class="corner"><img src="./constraints/corner.svg" /></div>
+			<div class="corner"><img src="./constraints/corner-top-left.svg" /></div>
 			<div class="horizontal-constraint" onclick="toggleConstraint(this, 'top')"><img id="top-0" src="./constraints/horizontal-off.svg" /></div>
 			<div class="horizontal-constraint" onclick="toggleConstraint(this, 'top')"><img id="top-1" src="./constraints/horizontal-off.svg" /></div>
 			<div class="horizontal-constraint" onclick="toggleConstraint(this, 'top')"><img id="top-2" src="./constraints/horizontal-off.svg" /></div>
 			<div class="horizontal-constraint" onclick="toggleConstraint(this, 'top')"><img id="top-3" src="./constraints/horizontal-off.svg" /></div>
-			<div class="corner"><img src="./constraints/corner.svg" style="rotate: 90deg;" /></div>
+			<div class="corner"><img src="./constraints/corner-top-right.svg" /></div>
 
 			<div class="vertical-constraint" onclick="toggleConstraint(this, 'left')"><img id="left-0" src="./constraints/vertical-off.svg" /></div>
 			<div class="cell" ondragover="dragOver(event)" ondrop="drop(event)" id="0-0"></div>
@@ -45,12 +46,12 @@
 			<div class="cell" ondragover="dragOver(event)" ondrop="drop(event)" id="3-3"></div>
 			<div class="vertical-constraint" onclick="toggleConstraint(this, 'right')"><img id="right-3" src="./constraints/vertical-off.svg" class="mirror-horizontal" /></div>
 
-			<div class="corner"><img src="./constraints/corner.svg" style="rotate: 270deg;" /></div>
+			<div class="corner"><img src="./constraints/corner-bottom-left.svg" /></div>
 			<div class="horizontal-constraint" onclick="toggleConstraint(this, 'bottom')"><img id="bottom-0" src="./constraints/horizontal-off.svg" class="mirror-vertical" /></div>
 			<div class="horizontal-constraint" onclick="toggleConstraint(this, 'bottom')"><img id="bottom-1" src="./constraints/horizontal-off.svg" class="mirror-vertical" /></div>
 			<div class="horizontal-constraint" onclick="toggleConstraint(this, 'bottom')"><img id="bottom-2" src="./constraints/horizontal-off.svg" class="mirror-vertical" /></div>
 			<div class="horizontal-constraint" onclick="toggleConstraint(this, 'bottom')"><img id="bottom-3" src="./constraints/horizontal-off.svg" class="mirror-vertical" /></div>
-			<div class="corner"><img src="./constraints/corner.svg" style="rotate: 180deg;" /></div>
+			<div class="corner"><img src="./constraints/corner-bottom-right.svg" /></div>
 		</div>
 		<div class="image-list" id="imageList">
 			<!-- Images will be added here -->
@@ -58,10 +59,14 @@
 	</div>
 	<div class="controls">
 		<button id="solve" onclick="solveButton()">Solve</button>
-		<button id="solve" onclick="countButton()">Count solutions</button>
+		<button id="count" onclick="countButton()">Count solutions</button>
+		<button id="save" onclick="saveButton()">Save</button>
 		<button id="reset" onclick="resetButton()">Reset</button><br />
-		<span id="counting">Counting the solutions, this may take a while...</span>
+		<span id="counting">Counting the solutions, this may take a while...</span>	
 	</div>
+	<div id="saved-puzzles"></div>
+
+	<canvas id="canvas"></canvas>
 
 	<script src="./scripts/game.js"></script>
 	<script src="./scripts/motion.js"></script>
@@ -69,6 +74,7 @@
     <script>
         let puzzle = new WalterPuzzle();
 		loadFromHash();
+		displaySavedPuzzles();
     </script>
 </body>
 </html>

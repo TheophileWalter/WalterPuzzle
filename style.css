@@ -79,3 +79,19 @@ img {
     display: none;
     margin-top: 1em;
 }
+#canvas {
+    display: none;
+}
+.saved-puzzle {
+    margin: 5px;
+    padding: 5px;
+    text-align: center;
+    cursor: pointer;
+    display: inline-block;
+    border: 1px solid #ccc;
+}
+.saved-puzzle img {
+    width: 150px;
+    height: 150px;
+    margin: 5px;
+}
