@@ -19,7 +19,15 @@ class WalterPuzzle {
 
         // Create a list of pieces
         // Just an array of 16 booleans to check if the piece is available
-        this.pieces = Array.from({ length: 16 }, (_, i) => true);
+        this.pieces = Array(16).fill(true);
+
+        // List of external constraints
+        this.constraints = {
+            'top': Array(4).fill(null),
+            'right': Array(4).fill(null),
+            'bottom': Array(4).fill(null),
+            'left': Array(4).fill(null)
+        };
 
     }
 
@@ -77,6 +85,14 @@ class WalterPuzzle {
             return null;
         }
         return this.getPiece(row, col - 1);
+    }
+
+    setConstraint(position, number, value) {
+        this.constraints[position][number] = value;
+    }
+
+    getConstraint(position, number) {
+        return this.constraints[position][number];
     }
 
     /**

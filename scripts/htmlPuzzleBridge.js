@@ -7,7 +7,11 @@
  * Converts the HTML elements to a WalterPuzzle object.
  */
 function htmlToGame() {
+
+    // Create a new puzzle object.
     var puzzle = new WalterPuzzle();
+
+    // Iterate over the 16 cells to set the pieces.
     for (var i = 0; i < 16; i++) {
         var x = Math.floor(i / 4), y = i % 4;
         var cell = document.getElementById(`${x}-${y}`);
@@ -15,6 +19,29 @@ function htmlToGame() {
             puzzle.setPiece(x, y, parseInt(cell.children[0].id));
         }
     }
+
+    // Set the constraints
+    var positions = ['top', 'right', 'bottom', 'left'];
+    positions.forEach(position => {
+        for (var i = 0; i < 4; i++) {
+            var img = document.getElementById(`${position}-${i}`);
+            var orientation = position == 'top' || position == 'bottom' ? 'horizontal' : 'vertical';
+            var state = extractBetween(img.src, orientation + '-', '.svg');
+            if (state == 'off') {
+                puzzle.setConstraint(position, i, null);
+            } else if (position == 'top') {
+                puzzle.setConstraint(position, i, state == 'down');
+            } else if (position == 'right') {
+                puzzle.setConstraint(position, i, state == 'left');
+            } else if (position == 'bottom') {          
+                puzzle.setConstraint(position, i, state == 'up');
+            } else if (position == 'left') {
+                puzzle.setConstraint(position, i, state == 'right');
+            }
+        }
+    });
+
+    // Return the puzzle object.
     return puzzle;
 }
 
@@ -116,6 +143,7 @@ function toggleConstraint(element, side) {
         else if (state == 'left') newState = 'right';
     }
     img.src = img.src.replace(`${orientation}-${state}.svg`, `${orientation}-${newState}.svg`);
+    puzzle = htmlToGame();
 }
 
 function extractBetween(src, startVar, endVar) {
