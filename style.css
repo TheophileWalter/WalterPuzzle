@@ -33,8 +33,9 @@
     border: 1px solid #ccc;
 }
 .grid .corner {
-    width: 64px;
+    width: 60px;
     height: 60px;
+    justify-content: right;
 }
 .grid .horizontal-constraint {
     width: 60px;
@@ -45,7 +46,7 @@
 .grid .vertical-constraint {
     width: 40px;
     height: 60px;
-    margin-left: 10px;
+    margin-left: 8px;
     cursor: pointer;
 }
 .grid .vertical-constraint img, .grid .horizontal-constraint img, .grid .corner img {
@@ -64,4 +65,10 @@ img {
 }
 .green-filter {
     filter: invert(100%) sepia(100%) saturate(2000%) hue-rotate(40deg) brightness(97%) contrast(80%);
+}
+.mirror-horizontal {
+    transform: scaleY(-1);
+}
+.mirror-vertical {
+    transform: scaleX(-1);
 }
