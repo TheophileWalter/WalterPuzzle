@@ -97,7 +97,7 @@ function loadFromHash() {
     }
 }
 
-function toggleConstraint(element, side, number) {
+function toggleConstraint(element, side) {
     var img = element.children[0];
     var orientation = side == 'top' || side == 'bottom' ? 'horizontal' : 'vertical';
     var state = extractBetween(img.src, orientation + '-', '.svg');
