@@ -171,6 +171,7 @@ function toggleConstraint(element, side) {
     }
     img.src = img.src.replace(`${orientation}-${state}.svg`, `${orientation}-${newState}.svg`);
     puzzle = htmlToGame();
+    location.hash = puzzle.getHash();
 }
 
 function extractBetween(src, startVar, endVar) {

@@ -187,17 +187,46 @@ class WalterPuzzle {
      * @returns {string} The hash of the puzzle game.
      */
     getHash() {
-        return btoa(this.grid.flat().map(piece => piece === null ? '' : piece.number).join('-'));
+        var cells = this.grid.flat().map(piece => piece === null ? '' : piece.number).join('-');
+        var constraints = Object.values(this.constraints).flat().map(constraint => constraint === null ? '' : constraint ? '1' : '0').join('-');
+        return btoa(cells + ';' + constraints);
     }
 
     static fromHash(hash) {
-        var numbers = atob(hash).split('-');
+
+        // Decode the hash
+        var parts = atob(hash).split(';');
+        if (parts.length !== 2) {
+            return null;
+        }
+
+        // Parse the parts
+        var numbers = parts[0].split('-');
+        var constraints = parts[1].split('-');
+
+        // Create the puzzle
         var puzzle = new WalterPuzzle();
+
+        // Set the pieces
         numbers.forEach((number, index) => {
             if (number !== '') {
                 puzzle.setPiece(Math.floor(index / 4), index % 4, parseInt(number));
             }
         });
+
+        // Set the constraints
+        var positions = ['top', 'right', 'bottom', 'left'];
+        positions.forEach((position, positionIndex) => {
+            for (var i = 0; i < 4; i++) {
+                var value = constraints[positionIndex * 4 + i];
+                if (value === '') {
+                    puzzle.setConstraint(position, i, null);
+                } else {
+                    puzzle.setConstraint(position, i, value === '1');
+                }
+            }
+        });
+
         return puzzle;
     }
 
