@@ -124,7 +124,15 @@ class WalterPuzzle {
                         // Check if the placement is invalid
                         var piece = new WalterPiece(pieceNumber);
                         var up = puzzle.getUp(x, y), right = puzzle.getRight(x, y), down = puzzle.getDown(x, y), left = puzzle.getLeft(x, y);
-                        if ((up !== null && up.down == piece.up) || (right !== null && right.left == piece.right) || (down !== null && down.up == piece.down) || (left !== null && left.right == piece.left)) {
+
+                        var topConstraint = puzzle.getConstraint('top', y),
+                            rightConstraint = puzzle.getConstraint('right', x),
+                            bottomConstraint = puzzle.getConstraint('bottom', y),
+                            leftConstraint = puzzle.getConstraint('left', x);
+                        if (((up !== null && up.down == piece.up) || (x == 0 && topConstraint !== null && topConstraint == piece.up)) ||
+                            ((right !== null && right.left == piece.right) || (y == 3 && rightConstraint !== null && rightConstraint == piece.right)) ||
+                            ((down !== null && down.up == piece.down) || (x == 3 && bottomConstraint !== null && bottomConstraint == piece.down)) ||
+                            ((left !== null && left.right == piece.left) || (y == 0 && leftConstraint !== null && leftConstraint == piece.left))) {
                             continue;
                         }
                         

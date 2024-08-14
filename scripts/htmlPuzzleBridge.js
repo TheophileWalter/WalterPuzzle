@@ -51,6 +51,8 @@ function htmlToGame() {
  * @param {boolean} markGreen If true, the green filter will be applied to the new pieces.
  */
 function gameToHtml(puzzle, markGreen = false) {
+
+    // Remove all the images from the cells
     var imageList = document.getElementById('imageList');
     for (var i = 0; i < 16; i++) {
         var x = Math.floor(i / 4), y = i % 4;
@@ -69,7 +71,32 @@ function gameToHtml(puzzle, markGreen = false) {
             }
         }
     }
+
+    // Set the constraints
+    var positions = ['top', 'right', 'bottom', 'left'];
+    positions.forEach(position => {
+        for (var i = 0; i < 4; i++) {
+            var img = document.getElementById(`${position}-${i}`);
+            var orientation = position == 'top' || position == 'bottom' ? 'horizontal' : 'vertical';
+            var state = puzzle.getConstraint(position, i);
+            if (state === null) {
+                img.src = img.src.replace(new RegExp(`${orientation}-.*\\.svg`), `${orientation}-off.svg`);
+            } else if (position == 'top') {
+                img.src = img.src.replace(new RegExp(`${orientation}-.*\\.svg`), `${orientation}-${state ? 'down' : 'up'}.svg`);
+            } else if (position == 'right') {
+                img.src = img.src.replace(new RegExp(`${orientation}-.*\\.svg`), `${orientation}-${state ? 'left' : 'right'}.svg`);
+            } else if (position == 'bottom') {
+                img.src = img.src.replace(new RegExp(`${orientation}-.*\\.svg`), `${orientation}-${state ? 'up' : 'down'}.svg`);
+            } else if (position == 'left') {
+                img.src = img.src.replace(new RegExp(`${orientation}-.*\\.svg`), `${orientation}-${state ? 'right' : 'left'}.svg`);
+            }
+        }
+    });
+
+    // Display the errors
     displayErrors(markGreen);
+
+    // Update the hash
     window.location.hash = puzzle.getHash();
 }
 
