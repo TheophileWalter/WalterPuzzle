@@ -175,7 +175,14 @@ class WalterPuzzle {
                 continue;
             }
             var up = this.getUp(x, y), right = this.getRight(x, y), down = this.getDown(x, y), left = this.getLeft(x, y);
-            if ((up !== null && up.down == piece.up) || (right !== null && right.left == piece.right) || (down !== null && down.up == piece.down) || (left !== null && left.right == piece.left)) {
+            var topConstraint = puzzle.getConstraint('top', y),
+                rightConstraint = puzzle.getConstraint('right', x),
+                bottomConstraint = puzzle.getConstraint('bottom', y),
+                leftConstraint = puzzle.getConstraint('left', x);
+            if ((up !== null && up.down == piece.up) || (x == 0 && topConstraint !== null && topConstraint == piece.up) ||
+                (right !== null && right.left == piece.right) || (y == 3 && rightConstraint !== null && rightConstraint == piece.right) ||
+                (down !== null && down.up == piece.down) || (x == 3 && bottomConstraint !== null && bottomConstraint == piece.down) ||
+                (left !== null && left.right == piece.left) || (y == 0 && leftConstraint !== null && leftConstraint == piece.left)) {
                 errors.push(parseInt(piece.number));
             }
         }

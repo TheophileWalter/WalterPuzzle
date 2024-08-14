@@ -106,8 +106,10 @@ function gameToHtml(puzzle, markGreen = false) {
  */
 function displayErrors(preserveGreen = false) {
     var errors = puzzle.getErrors();
+    console.log(errors);
     for (var i = 0; i < 16; i++) {
         if (errors.indexOf(i) > -1) {
+            document.getElementById(i).classList.remove('green-filter');
             document.getElementById(i).classList.add('red-filter');
         } else {
             document.getElementById(i).classList.remove('red-filter');
@@ -169,8 +171,10 @@ function toggleConstraint(element, side) {
         if (state == 'off') newState = 'left';
         else if (state == 'left') newState = 'right';
     }
+    console.log(`Set constraint ${side}-${img.id.split('-')[1]} to ${newState}`);
     img.src = img.src.replace(`${orientation}-${state}.svg`, `${orientation}-${newState}.svg`);
     puzzle = htmlToGame();
+    displayErrors();
     location.hash = puzzle.getHash();
 }
 

@@ -57,7 +57,7 @@ function drop(event) {
 
             // Set an image to a cell
             
-            console.log(`set piece ${draggedImage.id} to cell ${targetCell.id}`);
+            console.log(`Set piece ${draggedImage.id} to cell ${targetCell.id}`);
             targetCell.appendChild(draggedImage);
 
         } else {
@@ -66,10 +66,10 @@ function drop(event) {
 
             const existingImage = targetCell.children[0];
 
-            console.log(`remove piece ${existingImage.id} from cell ${targetCell.id}`);
+            console.log(`Remove piece ${existingImage.id} from cell ${targetCell.id}`);
             imageList.appendChild(existingImage);
 
-            console.log(`set piece ${draggedImage.id} to cell ${targetCell.id}`);
+            console.log(`Set piece ${draggedImage.id} to cell ${targetCell.id}`);
             targetCell.appendChild(draggedImage);
 
         }
@@ -78,7 +78,7 @@ function drop(event) {
 
         // Remove an image from a cell
 
-        console.log(`remove piece ${draggedImage.id}`);
+        console.log(`Remove piece ${draggedImage.id}`);
         imageList.appendChild(draggedImage);
 
     }
