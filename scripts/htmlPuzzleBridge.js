@@ -106,7 +106,6 @@ function gameToHtml(puzzle, markGreen = false) {
  */
 function displayErrors(preserveGreen = false) {
     var errors = puzzle.getErrors();
-    console.log(errors);
     for (var i = 0; i < 16; i++) {
         if (errors.indexOf(i) > -1) {
             document.getElementById(i).classList.remove('green-filter');
@@ -124,6 +123,7 @@ function displayErrors(preserveGreen = false) {
  * Solves the puzzle game and updates the HTML elements.
  */
 function solveButton() {
+    console.log('Solving the puzzle');
     if (puzzle.getErrors().length > 0) {
         alert('The puzzle has errors.');
         return;
@@ -135,9 +135,23 @@ function solveButton() {
 }
 
 /**
+ * Counts the number of solutions to the puzzle game.
+ */
+function countButton() {
+    console.log('Counting the solutions');
+    document.getElementById('counting').style.display = 'block';
+    setTimeout(() => {
+        var count = puzzle.solve(true);
+        document.getElementById('counting').style.display = 'none';
+        alert(`The puzzle has ${count} solution${count == 1 ? '' : 's'}.`);
+    }, 100);
+}
+
+/**
  * Resets the puzzle game and updates the HTML elements.
  */
 function resetButton() {
+    console.log('Resetting the puzzle');
     puzzle = new WalterPuzzle();
     gameToHtml(puzzle);
 }
@@ -149,6 +163,7 @@ function loadFromHash() {
     var hash = window.location.hash;
     if (hash.length > 1) {
         puzzle = WalterPuzzle.fromHash(hash.substring(1));
+        console.log(`Loaded puzzle from hash: ${hash}`);
         gameToHtml(puzzle);
     }
 }

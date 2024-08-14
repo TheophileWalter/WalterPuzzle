@@ -97,9 +97,10 @@ class WalterPuzzle {
 
     /**
      * Solves the puzzle game.
-     * @returns {boolean} True if the puzzle was solved, false otherwise.
+     * @param {boolean} count If true, the function will return the number of solutions.
+     * @returns {boolean|number} True if the puzzle was solved, false otherwise. If count is true, the number of solutions will be returned.
      */
-    solve() {
+    solve(count = false) {
         /**
          * Recursive function to solve the puzzle.
          * @param {WalterPuzzle} puzzle The puzzle to solve.
@@ -110,13 +111,14 @@ class WalterPuzzle {
             
             // If there are no more pieces to place, check if the puzzle is solved
             if (remaining.length === 0) {
-                return puzzle.getErrors().length === 0;
+                return puzzle.getErrors().length === 0 ? (count ? 1 : true) : (count ? 0 : false);
             }
 
             // Get the first piece to place
             var pieceNumber = remaining[0];
 
             // Try to place the piece in each empty cell
+            var totalSolutions = 0;
             for (var x = 0; x < 4; x++) {
                 for (var y = 0; y < 4; y++) {
                     if (puzzle.getPiece(x, y) === null) {
@@ -140,8 +142,12 @@ class WalterPuzzle {
                         puzzle.setPiece(x, y, pieceNumber);
 
                         // Recursively try to place the remaining pieces
-                        if (reccursiveSolver(puzzle, remaining.slice(1))) {
+                        var result = reccursiveSolver(puzzle, remaining.slice(1));
+                        if (!count && result) {
                             return true;
+                        }
+                        if (count) {
+                            totalSolutions += result;
                         }
                         
                         // Remove the piece if this configuration leads to a dead end
@@ -150,7 +156,7 @@ class WalterPuzzle {
                 }
             }
 
-            return false;
+            return count ? totalSolutions : false;
 
         }
         var remaining = this.pieces.reduce((acc, curr, index) => {

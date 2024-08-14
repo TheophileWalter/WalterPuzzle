@@ -1,3 +1,6 @@
+body {
+    font-family: sans-serif;
+}
 .container {
     display: flex;
 }
@@ -71,4 +74,8 @@ img {
 }
 .mirror-vertical {
     transform: scaleX(-1);
+}
+#counting {
+    display: none;
+    margin-top: 1em;
 }
