@@ -143,7 +143,7 @@ function countButton() {
     setTimeout(() => {
         var count = puzzle.solve(true);
         document.getElementById('counting').style.display = 'none';
-        alert(`The puzzle has ${count} solution${count == 1 ? '' : 's'}.`);
+        alert(`The puzzle has ${count} solution${count < 2 ? '' : 's'}.`);
     }, 100);
 }
 
@@ -185,6 +185,9 @@ function saveButton() {
     });
 }
 
+/**
+ * Displays the saved puzzles.
+ */
 function displaySavedPuzzles() {
     let puzzles = JSON.parse(localStorage.getItem('puzzles') || '[]');
     var list = document.getElementById('saved-puzzles');
@@ -229,6 +232,11 @@ function loadFromHash() {
     }
 }
 
+/**
+ * Toggles an external constraint
+ * @param {HTMLElement} element The element to toggle.
+ * @param {string} side The side of the constraint (top, right, bottom, left).
+ */
 function toggleConstraint(element, side) {
     var img = element.children[0];
     var orientation = side == 'top' || side == 'bottom' ? 'horizontal' : 'vertical';
@@ -254,6 +262,13 @@ function toggleConstraint(element, side) {
     location.hash = puzzle.getHash();
 }
 
+/**
+ * Extracts a string between two variables.
+ * @param {string} src The source string.
+ * @param {string} startVar The start variable.
+ * @param {string} endVar The end variable.
+ * @returns {string} The string between the two variables.
+ */
 function extractBetween(src, startVar, endVar) {
     var regex = new RegExp(startVar + "(.*?)" + endVar);
     var match = src.match(regex);
