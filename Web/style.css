@@ -320,6 +320,25 @@ button.primary {
     filter: url(#piece-normal);
 }
 
+footer {
+    margin-top: 24px;
+    text-align: center;
+}
+footer a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-radius: 8px;
+}
+footer a:hover {
+    color: var(--text);
+    background: var(--surface);
+}
+
 /* Message banner */
 
 .message {
