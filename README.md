@@ -1,5 +1,7 @@
 # Walter Puzzle
 
+<p align="right">🇬🇧 <b>English</b> · 🇫🇷 <a href="README.fr.md">Français</a></p>
+
 <p align="center">
   <a href="https://walter.tw/puzzle/"><img src="Images/play-online.svg" alt="Play online" height="60"></a>
 </p>
