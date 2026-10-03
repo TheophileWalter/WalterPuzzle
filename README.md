@@ -1,5 +1,9 @@
 # Walter Puzzle
 
+<p align="center">
+  <a href="https://walter.tw/puzzle/"><img src="Images/play-online.svg" alt="Play online" height="60"></a>
+</p>
+
 The Walter Puzzle is a tiling puzzle made of **16 jigsaw-like pieces** that must be fitted into a **4 × 4 grid**.
 It looks simple, every piece fits with almost every other one, but filling the whole grid without a single mismatch is a real logic challenge.
 
