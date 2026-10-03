@@ -12,19 +12,6 @@ The puzzle exists in two forms:
 - a **physical version**, 3D printable (a base plate and 16 pieces, see `3D Models/`);
 - a **web version** (see `Web/`), playable on computer and phone, which can also generate challenges, add optional constraints, solve a grid and count its solutions.
 
-## The 3D printed puzzle
-
-<table>
-  <tr>
-    <td align="center"><img src="Images/3D_1.jpg" width="400"><br>The base plate</td>
-    <td align="center"><img src="Images/3D_2.jpg" width="400"><br>The 16 pieces</td>
-  </tr>
-  <tr>
-    <td align="center"><img src="Images/3D_3.jpg" width="400"><br>One piece left to place</td>
-    <td align="center"><img src="Images/3D_4.jpg" width="400"><br>A solved grid</td>
-  </tr>
-</table>
-
 ## The pieces
 
 Each piece is a square with four sides: top, right, bottom and left.
@@ -50,6 +37,19 @@ Across the whole set, every side is balanced: 8 pieces have a tab on top and 8 h
 4. The outer border of the grid is free: any side can face the edge of the board.
 
 The puzzle is solved when all 16 pieces are placed and every contact between neighbours is a tab facing a hole.
+
+## The 3D printed puzzle
+
+<table>
+  <tr>
+    <td align="center"><img src="Images/3D_1.jpg" width="400"><br>The base plate</td>
+    <td align="center"><img src="Images/3D_2.jpg" width="400"><br>The 16 pieces</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="Images/3D_3.jpg" width="400"><br>One piece left to place</td>
+    <td align="center"><img src="Images/3D_4.jpg" width="400"><br>A solved grid</td>
+  </tr>
+</table>
 
 ### Example of a solution
 
