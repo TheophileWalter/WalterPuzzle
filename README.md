@@ -6,7 +6,7 @@ It looks simple, every piece fits with almost every other one, but filling the w
 The puzzle exists in two forms:
 
 - a **physical version**, 3D printable (a base plate and 16 pieces, see `3D Models/`);
-- a **web version** (see `Web/`), where pieces are dragged onto the grid, and which can also add optional constraints, solve a grid and count its solutions.
+- a **web version** (see `Web/`), playable on computer and phone, which can also generate challenges, add optional constraints, solve a grid and count its solutions.
 
 ## The 3D printed puzzle
 
@@ -91,6 +91,18 @@ Start with one or several pieces already placed in given cells, then complete th
 The more pieces are imposed, the fewer solutions remain, until a grid has a single solution.
 This works on the physical puzzle as well as in the web version.
 
+The web version can generate such challenges. It picks a random solution, reveals some of its pieces, and keeps only the pieces needed to reach the chosen difficulty. The given pieces are shown in black and cannot be moved.
+The difficulty depends on the number of solutions left by the given pieces: the fewer solutions, the harder the challenge.
+
+| Difficulty | Solutions left | Pieces usually given |
+|---|---|---|
+| Easy | 200 to 1,000 | 3 to 4 |
+| Medium | 20 to 199 | 4 to 5 |
+| Hard | 2 to 19 | 5 to 6 |
+| Expert | exactly 1 | 5 to 8 |
+
+Surprisingly, a harder challenge does not give many more pieces: as few as 5 well-chosen pieces can be enough to leave a single solution.
+
 ### Border constraints (web version only)
 
 In the web version, each of the 16 positions around the grid can optionally receive a constraint:
@@ -108,4 +120,4 @@ Border constraints alone are not enough to make a solution unique: even with all
 - `3D Models/plate.stl`: the base plate (135 × 135 mm), with guides marking the 16 cells.
 - `3D Models/pieces.stl`: the 16 pieces, ready to print.
 - `Images/pieces.stl.svg`: a flat view of the 16 pieces.
-- `Web/`: the web version. Open `Web/index.html` in a browser, drag the pieces onto the grid, click around the grid to add border constraints, and use **Solve**, **Count solutions** and **Save** to explore grids.
+- `Web/`: the web version. Open `Web/index.html` in a browser, choose a difficulty and start a **New challenge**, or play freely. Drag the pieces onto the grid (or tap a piece, then a cell), tap around the grid to add border constraints, and use **Hint**, **Solve**, **Count solutions** and **Save** to explore grids.

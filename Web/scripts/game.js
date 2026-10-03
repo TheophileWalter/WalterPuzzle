@@ -32,6 +32,7 @@ class WalterPiece {
  * If the constraint is null, the side has no constraint.
  * If the constraint is true, the side must be open.
  * If the constraint is false, the side must be closed.
+ * Pieces can also be locked in their cell, for example the pieces given by a challenge.
  */
 class WalterPuzzle {
 
@@ -42,6 +43,9 @@ class WalterPuzzle {
 
         // Create a 4x4 array
         this.grid = Array.from({ length: 4 }, () => Array(4).fill(null));
+
+        // Create a 4x4 array of locked cells
+        this.locked = Array.from({ length: 4 }, () => Array(4).fill(false));
 
         // Create a list of pieces
         // Just an array of 16 booleans to check if the piece is available
@@ -62,12 +66,14 @@ class WalterPuzzle {
      * @param {number} row The row of the grid.
      * @param {number} col The column of the grid.
      * @param {number} pieceNumber The number of the piece to set.
+     * @param {boolean} locked True if the piece cannot be moved by the player.
      */
-    setPiece(row, col, pieceNumber) {
+    setPiece(row, col, pieceNumber, locked = false) {
         if (this.grid[row][col] !== null) {
             this.pieces[this.grid[row][col].number] = true;
         }
         this.grid[row][col] = new WalterPiece(pieceNumber);
+        this.locked[row][col] = locked;
         this.pieces[pieceNumber] = false;
     }
 
@@ -79,6 +85,31 @@ class WalterPuzzle {
      */
     getPiece(row, col) {
         return this.grid[row][col];
+    }
+
+    /**
+     * Checks if the piece at the specified position is locked.
+     * @param {number} row The row of the grid.
+     * @param {number} col The column of the grid.
+     * @returns {boolean} True if the cell holds a locked piece.
+     */
+    isLocked(row, col) {
+        return this.locked[row][col];
+    }
+
+    /**
+     * Finds the position of a piece in the grid.
+     * @param {number} pieceNumber The number of the piece to find.
+     * @returns {{row: number, col: number}|null} The position of the piece or null if it is not in the grid.
+     */
+    findPiece(pieceNumber) {
+        for (var i = 0; i < 16; i++) {
+            var piece = this.grid[Math.floor(i / 4)][i % 4];
+            if (piece !== null && piece.number === pieceNumber) {
+                return { row: Math.floor(i / 4), col: i % 4 };
+            }
+        }
+        return null;
     }
 
     /**
@@ -110,6 +141,7 @@ class WalterPuzzle {
         }
         this.pieces[this.grid[row][col].number] = true;
         this.grid[row][col] = null;
+        this.locked[row][col] = false;
     }
 
     /**
@@ -185,76 +217,167 @@ class WalterPuzzle {
     }
 
     /**
+     * Removes all the external constraints.
+     */
+    clearConstraints() {
+        Object.values(this.constraints).forEach(constraints => constraints.fill(null));
+    }
+
+    /**
+     * Explores the ways to complete the grid.
+     * The pieces already in the grid stay in place and the external constraints are respected.
+     * The cells are filled in reading order, so each candidate piece only has to match its left and top neighbours,
+     * the external constraints and the pieces already placed to its right and below.
+     * @param {object} options The search options.
+     * @param {number} options.limit Stops the search after this number of solutions.
+     * @param {boolean} options.onlyLocked If true, only the locked pieces are kept, the other ones are ignored.
+     * @param {boolean} options.shuffle If true, the pieces are tried in a random order.
+     * @returns {{count: number, solution: Array<number>|null}} The number of solutions found (up to the limit)
+     * and the first solution as a list of 16 piece numbers in reading order.
+     */
+    search({ limit = Infinity, onlyLocked = false, shuffle = false } = {}) {
+
+        // Pieces kept in the grid, -1 for the cells to fill
+        var cells = this.grid.flat().map((piece, i) =>
+            piece === null || (onlyLocked && !this.locked[Math.floor(i / 4)][i % 4]) ? -1 : piece.number);
+
+        // For each cell, the sides whose shape is imposed (mask) and the imposed shapes (value)
+        var mask = Array(16).fill(0), value = Array(16).fill(0);
+        function impose(cell, side, open) {
+            mask[cell] |= side;
+            if (open) {
+                value[cell] |= side;
+            }
+        }
+        for (var i = 0; i < 4; i++) {
+            if (this.constraints.top[i] !== null) impose(i, 0b0001, !this.constraints.top[i]);
+            if (this.constraints.right[i] !== null) impose(i * 4 + 3, 0b0010, !this.constraints.right[i]);
+            if (this.constraints.bottom[i] !== null) impose(12 + i, 0b0100, !this.constraints.bottom[i]);
+            if (this.constraints.left[i] !== null) impose(i * 4, 0b1000, !this.constraints.left[i]);
+        }
+        var used = 0;
+        for (var i = 0; i < 16; i++) {
+            if (cells[i] === -1) {
+                continue;
+            }
+            used |= 1 << cells[i];
+            var x = Math.floor(i / 4), y = i % 4, p = cells[i];
+            if (y < 3) impose(i + 1, 0b1000, !(p & 0b0010));
+            if (y > 0) impose(i - 1, 0b0010, !(p & 0b1000));
+            if (x < 3) impose(i + 4, 0b0001, !(p & 0b0100));
+            if (x > 0) impose(i - 4, 0b0100, !(p & 0b0001));
+        }
+
+        // The pieces already placed must match their neighbours and the constraints
+        for (var i = 0; i < 16; i++) {
+            if (cells[i] !== -1 && (cells[i] & mask[i]) !== value[i]) {
+                return { count: 0, solution: null };
+            }
+        }
+
+        var order = Array.from({ length: 16 }, (_, i) => i);
+        var grid = cells.slice(), count = 0, solution = null;
+
+        /**
+         * Recursive function to fill the grid from the specified cell.
+         * @param {number} cell The index of the cell to fill.
+         * @returns {boolean} True if the limit of solutions is reached.
+         */
+        function reccursiveSolver(cell) {
+
+            // Skip the pieces already placed
+            while (cell < 16 && cells[cell] !== -1) {
+                cell++;
+            }
+
+            // The grid is full: this is a solution
+            if (cell === 16) {
+                if (solution === null) {
+                    solution = grid.slice();
+                }
+                count++;
+                return count >= limit;
+            }
+
+            // The left and top neighbours are always placed at this point
+            var m = mask[cell], v = value[cell];
+            if (cell % 4 > 0) {
+                m |= 0b1000;
+                if (!(grid[cell - 1] & 0b0010)) v |= 0b1000;
+            }
+            if (cell >= 4) {
+                m |= 0b0001;
+                if (!(grid[cell - 4] & 0b0100)) v |= 0b0001;
+            }
+
+            var candidates = shuffle ? WalterPuzzle.shuffle(order.slice()) : order;
+            for (var k = 0; k < 16; k++) {
+                var p = candidates[k];
+                if ((used >> p & 1) || (p & m) !== v) {
+                    continue;
+                }
+                used |= 1 << p;
+                grid[cell] = p;
+                var done = reccursiveSolver(cell + 1);
+                used &= ~(1 << p);
+                if (done) {
+                    return true;
+                }
+            }
+            grid[cell] = -1;
+            return false;
+        }
+
+        reccursiveSolver(0);
+        return { count: count, solution: solution };
+    }
+
+    /**
      * Solves the puzzle game.
+     * The pieces already in the grid stay in place.
      * @param {boolean} count If true, the function will return the number of solutions.
      * @returns {boolean|number} True if the puzzle was solved, false otherwise. If count is true, the number of solutions will be returned.
      */
     solve(count = false) {
-        /**
-         * Recursive function to solve the puzzle.
-         * @param {WalterPuzzle} puzzle The puzzle to solve.
-         * @param {Array<number>} remaining The list of remaining pieces to place.
-         * @returns {boolean} True if the puzzle was solved, false otherwise.
-         */
-        function reccursiveSolver(puzzle, remaining) {
-            
-            // If there are no more pieces to place, check if the puzzle is solved
-            if (remaining.length === 0) {
-                return puzzle.getErrors().length === 0 ? (count ? 1 : true) : (count ? 0 : false);
-            }
-
-            // Get the first piece to place
-            var pieceNumber = remaining[0];
-
-            // Try to place the piece in each empty cell
-            var totalSolutions = 0;
-            for (var x = 0; x < 4; x++) {
-                for (var y = 0; y < 4; y++) {
-                    if (puzzle.getPiece(x, y) === null) {
-
-                        // Check if the placement is invalid
-                        var piece = new WalterPiece(pieceNumber);
-                        var up = puzzle.getUp(x, y), right = puzzle.getRight(x, y), down = puzzle.getDown(x, y), left = puzzle.getLeft(x, y);
-
-                        var topConstraint = puzzle.getConstraint('top', y),
-                            rightConstraint = puzzle.getConstraint('right', x),
-                            bottomConstraint = puzzle.getConstraint('bottom', y),
-                            leftConstraint = puzzle.getConstraint('left', x);
-                        if (((up !== null && up.down == piece.up) || (x == 0 && topConstraint !== null && topConstraint == piece.up)) ||
-                            ((right !== null && right.left == piece.right) || (y == 3 && rightConstraint !== null && rightConstraint == piece.right)) ||
-                            ((down !== null && down.up == piece.down) || (x == 3 && bottomConstraint !== null && bottomConstraint == piece.down)) ||
-                            ((left !== null && left.right == piece.left) || (y == 0 && leftConstraint !== null && leftConstraint == piece.left))) {
-                            continue;
-                        }
-                        
-                        // Place the piece if it is valid
-                        puzzle.setPiece(x, y, pieceNumber);
-
-                        // Recursively try to place the remaining pieces
-                        var result = reccursiveSolver(puzzle, remaining.slice(1));
-                        if (!count && result) {
-                            return true;
-                        }
-                        if (count) {
-                            totalSolutions += result;
-                        }
-                        
-                        // Remove the piece if this configuration leads to a dead end
-                        puzzle.removePiece(x, y);
-                    }
-                }
-            }
-
-            return count ? totalSolutions : false;
-
+        if (count) {
+            return this.search().count;
         }
-        var remaining = this.pieces.reduce((acc, curr, index) => {
-            if (curr) {
-                acc.push(index);
+        var result = this.search({ limit: 1 });
+        if (result.solution === null) {
+            return false;
+        }
+        this.applySolution(result.solution);
+        return true;
+    }
+
+    /**
+     * Counts the solutions of the puzzle, keeping the pieces already in the grid.
+     * @param {number} limit Stops counting at this number of solutions.
+     * @param {boolean} onlyLocked If true, only the locked pieces are kept.
+     * @returns {number} The number of solutions, at most the limit.
+     */
+    countSolutions(limit = Infinity, onlyLocked = false) {
+        return this.search({ limit: limit, onlyLocked: onlyLocked }).count;
+    }
+
+    /**
+     * Places the missing pieces of a solution in the empty cells.
+     * @param {Array<number>} solution The 16 piece numbers of the solution in reading order.
+     */
+    applySolution(solution) {
+        solution.forEach((pieceNumber, i) => {
+            if (this.getPiece(Math.floor(i / 4), i % 4) === null) {
+                this.setPiece(Math.floor(i / 4), i % 4, pieceNumber);
             }
-            return acc;
-        }, []);
-        return reccursiveSolver(this, remaining);
+        });
+    }
+
+    /**
+     * Checks if the puzzle is complete and without errors.
+     * @returns {boolean} True if the puzzle is solved.
+     */
+    isSolved() {
+        return this.pieces.every(available => !available) && this.getErrors().length === 0;
     }
 
     /**
@@ -270,10 +393,10 @@ class WalterPuzzle {
                 continue;
             }
             var up = this.getUp(x, y), right = this.getRight(x, y), down = this.getDown(x, y), left = this.getLeft(x, y);
-            var topConstraint = puzzle.getConstraint('top', y),
-                rightConstraint = puzzle.getConstraint('right', x),
-                bottomConstraint = puzzle.getConstraint('bottom', y),
-                leftConstraint = puzzle.getConstraint('left', x);
+            var topConstraint = this.getConstraint('top', y),
+                rightConstraint = this.getConstraint('right', x),
+                bottomConstraint = this.getConstraint('bottom', y),
+                leftConstraint = this.getConstraint('left', x);
             if ((up !== null && up.down == piece.up) || (x == 0 && topConstraint !== null && topConstraint == piece.up) ||
                 (right !== null && right.left == piece.right) || (y == 3 && rightConstraint !== null && rightConstraint == piece.right) ||
                 (down !== null && down.up == piece.down) || (x == 3 && bottomConstraint !== null && bottomConstraint == piece.down) ||
@@ -293,7 +416,9 @@ class WalterPuzzle {
         var cells = this.grid.flat().map(piece => piece === null ? '10000' : '0' + piece.number.toString(2).padStart(4, '0')).join('');
         // Constraints are stored on 2 bits: 0x00 for null, 0x01 for false and 0x10 for true
         var constraints = Object.values(this.constraints).flat().map(constraint => constraint === null ? '00' : (constraint ? '10' : '01')).join('');
-        return WalterPuzzle.binaryToBase64(cells + constraints);
+        // Locked cells are stored on 1 bit
+        var locked = this.locked.flat().map(locked => locked ? '1' : '0').join('');
+        return WalterPuzzle.binaryToBase64(cells + constraints + locked);
     }
 
     /**
@@ -317,6 +442,11 @@ class WalterPuzzle {
             var constraint = parseInt(bin.slice(80 + i * 2, 80 + i * 2 + 2), 2);
             constraints.push(constraint === 0b00 ? '' : (constraint === 0b10 ? '1' : '0'));
         }
+        // Older hashes have no locked cells
+        var locked = [];
+        for (var i = 0; i < 16; i++) {
+            locked.push(bin.charAt(112 + i) === '1');
+        }
 
         // Create the puzzle
         var puzzle = new WalterPuzzle();
@@ -324,7 +454,7 @@ class WalterPuzzle {
         // Set the pieces
         numbers.forEach((number, index) => {
             if (number !== '') {
-                puzzle.setPiece(Math.floor(index / 4), index % 4, parseInt(number));
+                puzzle.setPiece(Math.floor(index / 4), index % 4, parseInt(number), locked[index]);
             }
         });
 
@@ -342,6 +472,65 @@ class WalterPuzzle {
         });
 
         return puzzle;
+    }
+
+    /**
+     * Creates a challenge: a grid with some locked pieces, taken from a random solution,
+     * whose number of solutions is between the specified bounds.
+     * The pieces are revealed one by one until there are few enough solutions,
+     * then the pieces that are not needed to stay under the maximum are removed.
+     * @param {number} minSolutions The minimum number of solutions of the challenge.
+     * @param {number} maxSolutions The maximum number of solutions of the challenge.
+     * @returns {WalterPuzzle} The challenge.
+     */
+    static generateChallenge(minSolutions, maxSolutions) {
+        while (true) {
+
+            // Pick a random solution of the free puzzle
+            var solution = new WalterPuzzle().search({ limit: 1, shuffle: true }).solution;
+
+            // Reveal its pieces in a random order until there are few enough solutions
+            var puzzle = new WalterPuzzle();
+            var cells = WalterPuzzle.shuffle(Array.from({ length: 16 }, (_, i) => i));
+            var count = Infinity;
+            for (var k = 0; k < 16 && count > maxSolutions; k++) {
+                puzzle.setPiece(Math.floor(cells[k] / 4), cells[k] % 4, solution[cells[k]], true);
+                count = puzzle.countSolutions(maxSolutions + 1);
+            }
+
+            // Too few solutions: the last revealed piece removed too many of them, try again
+            if (count < minSolutions) {
+                continue;
+            }
+
+            // Remove the pieces that are not needed, removing a piece can only add solutions
+            WalterPuzzle.shuffle(cells).forEach(cell => {
+                var x = Math.floor(cell / 4), y = cell % 4;
+                if (puzzle.getPiece(x, y) === null) {
+                    return;
+                }
+                var pieceNumber = puzzle.getPiece(x, y).number;
+                puzzle.removePiece(x, y);
+                if (puzzle.countSolutions(maxSolutions + 1) > maxSolutions) {
+                    puzzle.setPiece(x, y, pieceNumber, true);
+                }
+            });
+
+            return puzzle;
+        }
+    }
+
+    /**
+     * Shuffles an array in place.
+     * @param {Array} array The array to shuffle.
+     * @returns {Array} The shuffled array.
+     */
+    static shuffle(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
     }
 
     /**
