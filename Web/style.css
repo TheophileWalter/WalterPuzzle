@@ -161,6 +161,58 @@ button.primary {
     height: 92%;
 }
 
+/* Compact layout on phones */
+@media (max-width: 600px) {
+    body {
+        padding: 0 12px 24px;
+        font-size: 15px;
+    }
+    h1 {
+        margin: 10px 0 2px;
+        font-size: 1.35rem;
+    }
+    .subtitle {
+        margin-bottom: 8px;
+        font-size: 0.85rem;
+    }
+    button, select {
+        min-height: 38px;
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+    .challenge-bar, .controls {
+        gap: 6px;
+    }
+    .challenge-bar label {
+        font-size: 0.9rem;
+    }
+    .status {
+        margin: 8px 0;
+        font-size: 0.85rem;
+    }
+    .container {
+        gap: 10px;
+    }
+    .grid {
+        padding: 4px;
+    }
+    .controls {
+        margin-top: 10px;
+    }
+    .long-label {
+        display: none;
+    }
+    .help {
+        margin-top: 10px;
+        font-size: 0.8rem;
+    }
+    .message {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+}
+
 @media (min-width: 820px) {
     :root {
         --slot: 84px;

@@ -30,7 +30,7 @@ The puzzle exists in two forms:
 Each piece is a square with four sides: top, right, bottom and left.
 Each side is either a **tab** (it sticks out) or a **hole** (it goes in).
 
-With two possible shapes on four sides, there are 2 × 2 × 2 × 2 = **16 possible pieces**, and the puzzle contains **each of them exactly once**: from the piece with only holes to the piece with only tabs.
+With two possible shapes on four sides, there are 2<sup>4</sup> = **16 possible pieces**, and the puzzle contains **each of them exactly once**: from the piece with only holes to the piece with only tabs.
 
 <table>
   <tr><td align="center"><img src="Web/pieces/0.svg" width="60"><br>0</td><td align="center"><img src="Web/pieces/1.svg" width="60"><br>1</td><td align="center"><img src="Web/pieces/2.svg" width="60"><br>2</td><td align="center"><img src="Web/pieces/3.svg" width="60"><br>3</td><td align="center"><img src="Web/pieces/4.svg" width="60"><br>4</td><td align="center"><img src="Web/pieces/5.svg" width="60"><br>5</td><td align="center"><img src="Web/pieces/6.svg" width="60"><br>6</td><td align="center"><img src="Web/pieces/7.svg" width="60"><br>7</td></tr>
